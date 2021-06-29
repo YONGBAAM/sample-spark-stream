@@ -1,0 +1,12 @@
+syntax = "proto2";
+
+
+option java_package = "com.drake.book";
+option java_multiple_files=true;
+
+
+message WordJoin{
+  optional string word =1;
+  optional int32 count =2;
+
+}

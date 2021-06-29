@@ -1,0 +1,89 @@
+
+plugins {
+    id 'java'
+    id "com.github.johnrengelman.shadow" version "5.2.0"
+    id "com.google.protobuf" version "0.8.10"
+}
+
+group 'com.drake'
+version '0.1.0'
+
+repositories {
+    mavenCentral()
+}
+
+
+
+dependencies {
+    implementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+
+    implementation 'com.google.code.gson:gson:2.8.7'
+
+    // https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java
+    compile group: 'com.google.protobuf', name: 'protobuf-java', version: '3.10.0'
+
+
+    compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.4'
+//    implementation group: 'org.apache.kafka', name: 'kafka-clients', version: '2.3.1'
+    compile  'org.slf4j:slf4j-simple:1.7.30'
+    implementation 'com.google.code.gson:gson:2.8.7'
+//    compile 'org.apache.kafka:connect-api:2.5.0'
+//    compile 'org.apache.kafka:kafka-streams:2.5.0'
+
+    compile  'org.slf4j:slf4j-simple:1.7.30'
+
+    implementation 'com.google.code.gson:gson:2.8.7'
+    compile group: 'org.apache.spark', name: 'spark-streaming_2.11', version: '2.3.1'
+    compile group: 'org.apache.spark', name: 'spark-core_2.11', version: '2.3.1'
+    compile group: 'org.apache.spark', name: 'spark-streaming-kafka-0-10_2.11', version: '2.3.1'
+
+    implementation group: 'com.beust', name: 'jcommander', version: '1.7'
+
+    // https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java
+    compile group: 'com.google.protobuf', name: 'protobuf-java', version: '3.10.0'
+
+
+}
+
+test {
+    useJUnitPlatform()
+}
+
+
+
+apply plugin: "com.github.johnrengelman.shadow"
+
+shadowJar{
+
+    setBaseName("spark-book")
+    zip64 true
+    mergeServiceFiles()
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs 'build/generated/source/proto/main/grpc'
+            srcDirs 'build/generated/source/proto/main/java'
+        }
+    }
+}
+
+protobuf {
+    protoc {
+        artifact = 'com.google.protobuf:protoc:3.10.1'
+    }
+
+    plugins {
+        grpc {
+            artifact = 'io.grpc:protoc-gen-grpc-java:1.25.0'
+        }
+    }
+
+    generateProtoTasks {
+        all()*.plugins {
+            grpc {}
+        }
+    }
+}
