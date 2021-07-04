@@ -41,7 +41,7 @@ public class SparkStreamer {
 
 
         KafkaOffsetManager offsetManager = KafkaOffsetManager.builder()
-                .root(".").checkpointDirectory("checkpoints").markerDirectory("marker")
+                .root(".").checkpointDirectory("checkpoints").markerDirectory("markers")
                 .build();
         JavaSparkContext sc = new JavaSparkContext(
                 new SparkConf().setMaster("local").setAppName("word-count")
@@ -61,6 +61,8 @@ public class SparkStreamer {
         kafkaParams.put("enable.auto.commit", "false");
         kafkaParams.put("key.deserializer", StringDeserializer.class);
         kafkaParams.put("value.deserializer", ByteArrayDeserializer.class);
+
+        LOG.info("kafka params: " + kafkaParams.toString());
 
         JavaDStream<byte[]> stream = new KafkaStreamBuilder().setKafkaParamMap(kafkaParams)
                 .setStreamingContext(jsc).setTopicId(topic).setOffsetManager(offsetManager).build();
