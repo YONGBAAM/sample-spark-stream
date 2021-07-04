@@ -19,6 +19,11 @@ public class StreamingBatchListener implements StreamingListener {
 
     @Override
     public void onBatchCompleted(StreamingListenerBatchCompleted streamingListenerBatchCompleted) {
+        BatchInfo info = streamingListenerBatchCompleted.batchInfo();
+
+        // finish write to hbase : mark time
+        dataSourceIds.forEach(id ->
+                kafkaOffsetManager.markOffsets("" + info.batchTime().milliseconds(), id));
 
     }
 
