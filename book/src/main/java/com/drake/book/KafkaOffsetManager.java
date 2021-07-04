@@ -50,16 +50,19 @@ public class KafkaOffsetManager {
         writeToLocal(markerPrefix + "/" + topic, String.valueOf(time));
     }
 
+    @Deprecated
     public OffsetRange[] readOffsets(String id) {
         String jsonString = null;
 
-        // TODO: return null -> offset reset
         try (FileInputStream markerIs = new FileInputStream(root + "/" + markerPrefix + "/" + id)) {
             // compatible parser in S3
             String time = IOUtils.toString(markerIs);
             try (FileInputStream checkIs =
                          new FileInputStream(root + "/" + checkpointPrefix + "/" + getFileKey(time, id))) {
                 jsonString = IOUtils.toString(checkIs);
+
+
+                // return null -> offset reset
             } catch (IOException e) { return null; }
         } catch (IOException e) { return null; }
 

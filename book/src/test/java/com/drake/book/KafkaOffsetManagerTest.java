@@ -1,5 +1,6 @@
 package com.drake.book;
 
+import org.apache.kafka.common.TopicPartition;
 import org.apache.spark.streaming.kafka010.OffsetRange;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -7,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -41,8 +43,14 @@ class KafkaOffsetManagerTest {
         };
         offsetManager.makeCheckpoints(time, topic, offsetRanges);
         offsetManager.commitOffsets(time, topic);
-        Set<OffsetRange> readOffsets = Arrays.stream(offsetManager.readOffsets(topic)).collect(Collectors.toSet());
-        Set<OffsetRange> expectedOffsets = Arrays.stream(offsetRanges).collect(Collectors.toSet());
+//        Set<OffsetRange> readOffsets = Arrays.stream(offsetManager.readOffsets(topic)).collect(Collectors.toSet());
+
+        Map<TopicPartition, Long> expectedOffsets = Arrays.stream(offsetRanges)
+                .collect(Collectors.toMap(
+                        x -> new TopicPartition(x.topic(), x.partition()),
+                        x -> x.untilOffset()
+                ));
+        Map<TopicPartition, Long> readOffsets = offsetManager.readOffsetsTopicPartition(topic);
         assertEquals(readOffsets, expectedOffsets);
     }
 
