@@ -2,7 +2,6 @@ package com.drake.book;
 
 import com.beust.jcommander.Parameter;
 import com.google.gson.Gson;
-import jdk.jfr.internal.tool.Main;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
@@ -12,17 +11,15 @@ import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.storage.StorageLevel;
-import scala.Int;
 import scala.Tuple2;
 
 import java.io.FileOutputStream;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.Locale;
 import java.util.Map;
 
-public class MainClass implements Serializable {
+public class PracticeClass implements Serializable {
 
     @Parameter(names = {"--app-name", "-n", "--name"})
     private String appName = "sample app";
@@ -134,7 +131,7 @@ public class MainClass implements Serializable {
                 new SparkConf().setMaster("local").setAppName("README.md")
         );
         JavaRDD<String> lines = sc.textFile("README.md");
-        MainClass in = new MainClass();
+        PracticeClass in = new PracticeClass();
         JavaRDD<WordJoin> rrr = Processors.makeWordCountRdd(lines);
         rrr.persist(StorageLevel.MEMORY_AND_DISK());
         in.exampleOutputJson(rrr, "readme");

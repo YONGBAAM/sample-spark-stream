@@ -21,13 +21,31 @@ public class KafkaStreamBuilder {
     private Map<String, Object> kafkaParamMap;
     private String topicId;
 
+    public KafkaStreamBuilder setOffsetManager(KafkaOffsetManager offsetManager) {
+        this.offsetManager = offsetManager;
+        return this;
+    }
 
+    public KafkaStreamBuilder setStreamingContext(JavaStreamingContext streamingContext) {
+        this.streamingContext = streamingContext;
+        return this;
+    }
+
+    public KafkaStreamBuilder setKafkaParamMap(Map<String, Object> kafkaParamMap) {
+        this.kafkaParamMap = kafkaParamMap;
+        return this;
+    }
+
+    public KafkaStreamBuilder setTopicId(String topicId) {
+        this.topicId = topicId;
+        return this;
+    }
 
     // TODO: stream all in once?
-    public JavaDStream<Byte[]> build() {
+    public JavaDStream<byte[]> build() {
         Map<TopicPartition, Long> offsets = offsetManager.readOffsetsTopicPartition(topicId);
 
-        JavaInputDStream<ConsumerRecord<String, Byte[]>> stream;
+        JavaInputDStream<ConsumerRecord<String, byte[]>> stream;
         if ( offsets == null) {
             // directstream(context, locationst, cunsumerst(topics, kafkaparams, (offset))
             stream =
