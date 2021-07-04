@@ -1,5 +1,9 @@
 credentials.yml
 folder/
+**/markers/
+checkpoints/
+testMarkers/
+testCheckpoints/
 
 .gradle
 /build
