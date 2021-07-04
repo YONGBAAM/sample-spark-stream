@@ -1,9 +1,9 @@
-*.yaml
-folder/
-**/markers/
-checkpoints/
-testMarkers/
-testCheckpoints/
+**/*.yaml
+folder
+**/markers
+**/checkpoints
+**/testMarkers
+**/testCheckpoints
 
 .gradle
 /build
