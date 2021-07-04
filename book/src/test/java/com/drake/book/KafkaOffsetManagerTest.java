@@ -1,7 +1,6 @@
 package com.drake.book;
 
 import org.apache.spark.streaming.kafka010.OffsetRange;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -31,7 +30,7 @@ class KafkaOffsetManagerTest {
     @Test
     public void test() throws IOException {
 
-        final String time = "14141414";
+        final int time = 14141414;
         final String topic = "sample.topic.1";
         OffsetRange[] offsetRanges ={
                 OffsetRange.create(topic,0, 11, 22),
@@ -40,8 +39,8 @@ class KafkaOffsetManagerTest {
 
 
         };
-        offsetManager.checkOffsets(time, topic, offsetRanges);
-        offsetManager.markOffsets(time, topic);
+        offsetManager.makeCheckpoints(time, topic, offsetRanges);
+        offsetManager.commitOffsets(time, topic);
         Set<OffsetRange> readOffsets = Arrays.stream(offsetManager.readOffsets(topic)).collect(Collectors.toSet());
         Set<OffsetRange> expectedOffsets = Arrays.stream(offsetRanges).collect(Collectors.toSet());
         assertEquals(readOffsets, expectedOffsets);

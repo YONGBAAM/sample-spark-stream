@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -32,20 +33,21 @@ public class KafkaOffsetManager {
         this.checkpointPrefix = checkpointDirectory;
         this.markerPrefix = markerDirectory;
     }
-    // Json으로 받기
 
-    public void checkOffsets(String time, String id, OffsetRange[] ranges) {
+
+    // TODO: time to long?
+    public void makeCheckpoints(long time, String topic, OffsetRange[] ranges) {
         String rangeJson = new Gson().toJson(ranges);
-        String key = getFileKey(time, id);
+        String key = getFileKey(""+time, topic);
         LOG.info("Commit key: " + key + " ranges: " + rangeJson);
 
         writeToLocal(checkpointPrefix + "/" + key, rangeJson);
 
     }
 
-    public void markOffsets(String time, String id) {
-        LOG.info("Commit id: " + id + " time: " + time);
-        writeToLocal(markerPrefix + "/" + id, time);
+    public void commitOffsets(long time, String topic) {
+        LOG.info("Commit topic: " + topic + " time: " + time);
+        writeToLocal(markerPrefix + "/" + topic, String.valueOf(time));
     }
 
     public OffsetRange[] readOffsets(String id) {
@@ -64,8 +66,33 @@ public class KafkaOffsetManager {
         return jsonString == null? null : new Gson().fromJson(jsonString, OffsetRange[].class);
     }
 
+    public Map<TopicPartition, Long> readOffsetsTopicPartition(String topic) {
+        String jsonString = null;
+
+        // TODO: return null -> offset reset
+        try (FileInputStream markerIs = new FileInputStream(root + "/" + markerPrefix + "/" + topic)) {
+            // compatible parser in S3
+            String time = IOUtils.toString(markerIs);
+            try (FileInputStream checkIs =
+                         new FileInputStream(root + "/" + checkpointPrefix + "/" + getFileKey(time, topic))) {
+                jsonString = IOUtils.toString(checkIs);
+            } catch (IOException e) { return null; }
+        } catch (IOException e) { return null; }
+        if (jsonString == null){ return null;}
+        OffsetRange[] ranges = new Gson().fromJson(jsonString, OffsetRange[].class);
+
+        return toTopicPartitionMap(ranges);
+    }
+
+    private static Map<TopicPartition, Long> toTopicPartitionMap(final OffsetRange[] ranges ) {
+        return Arrays.stream(ranges).collect(Collectors.toMap(
+                offsetRange -> new TopicPartition(offsetRange.topic(), offsetRange.partition()),
+                offsetRange -> offsetRange.untilOffset()
+        ));
+    }
+
     private static String getFileKey(String time, String id) {
-        return time + "_" + id;
+        return ""+ time + "_" + id;
     }
 
     private Map<TopicPartition, Integer> deSerializeOffsetRanges(String offsetLines) {

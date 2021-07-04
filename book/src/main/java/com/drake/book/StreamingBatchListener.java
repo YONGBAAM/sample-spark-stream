@@ -23,7 +23,7 @@ public class StreamingBatchListener implements StreamingListener {
 
         // finish write to hbase : mark time
         dataSourceIds.forEach(id ->
-                kafkaOffsetManager.markOffsets("" + info.batchTime().milliseconds(), id));
+                kafkaOffsetManager.commitOffsets(info.batchTime().milliseconds(), id));
 
     }
 

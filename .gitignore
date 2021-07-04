@@ -1,4 +1,4 @@
-credentials.yml
+*.yaml
 folder/
 **/markers/
 checkpoints/
